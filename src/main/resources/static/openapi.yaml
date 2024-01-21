@@ -1,0 +1,224 @@
+openapi: 3.0.0
+info:
+  title: API MyRestApp
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1/api
+paths:
+  /admin:
+    post:
+      summary: Create a new person
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDTO'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+  /admin/{id}:
+    put:
+      summary: Update a person
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDTO'
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+    delete:
+      summary: Delete a person
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+  /auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  JWT-token:
+                    type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+  /auth/registration:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  JWT-token:
+                    type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+  /people:
+    get:
+      summary: Get all people
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+  /people/{id}:
+    get:
+      summary: Get a person
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonErrorResponse'
+components:
+  securitySchemes:
+    BearerAuth:            # Arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AdminDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя не должно быть пустым. Имя должно быть от 2 до 100 символов.
+        password:
+          type: string
+          description: Пароль не должен быть пустым.
+        role:
+          type: string
+          description: Роль не должна быть пустой.
+    AuthDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Имя не должно быть пустым. Имя должно быть от 2 до 100 символов.
+        password:
+          type: string
+          description: Пароль не должен быть пустым.
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+          description: Имя не должно быть пустым. Имя должно быть от 2 до 100 символов.
+        password:
+          type: string
+          description: Пароль не должен быть пустым.
+        role:
+          type: string
+          description: Роль не должна быть пустой.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdWho:
+          type: string
+    PersonErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Сообщение об ошибке
+        timestamp:
+          type: string
+          format: date-time
+          description: Время, когда произошла ошибка

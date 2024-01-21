@@ -1,0 +1,1 @@
+alter sequence person_rest_id_seq restart with 1;
